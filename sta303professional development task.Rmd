@@ -1,0 +1,87 @@
+---
+title: "Capacity and Occupancy of the shelters in Toronto during COVID-19"
+author: "Shuyu Duan"
+date: "01/04/2021"
+output:
+  html_document: default
+  pdf_document: default
+abstract: During the COVID-19 period, the shelters' situation is changing, and more homeless people prefer to sleep outside rather than inside. This paper explores the Daily Shelter Occupancy data set, which was collected in Toronto in 2020. We find that the spaces in the shelter may not be enough for the homeless clients to stay and it is very dangerous to stay in a cloudy area during the COVID-19 period. The study indicated the issues about homeless people during COVID-19 and understood the shelter system in Toronto.
+---
+
+
+# Introduction
+
+  COVID-19 has become a severe issue in 2020. The coronavirus spread very quickly in a dense population and the chance for getting the disease is high. Many people are suffering from the disease, including homeless people. The article "COVID-19 pushing homeless into encampment" form spacingTORONTO mentioned that there could currently be approximately 1000 to 1500 individuals sleeping on the street or homeless encampment in Toronto, which is about a threefold increase compared with the data in 2018. In this study, we want to explore the relationship between the shelters' capacity and occupancy and the reasons that lead homeless people to sleep outdoor rather than indoor. The data set is derived from OPEN DATA; it collects the information of all the active shelters in Toronto. A total of 31162 observation has been collected since the beginning of the year for this statistical analysis. We found that the spaces in most of the shelters may not be enough for homeless people to stay.
+  
+  In this study, we used ggplot to explore the relationship between capacity and occupancy. Most of the shelters' capacity is less than 250 and the occupancy for most of the shelters is less than 200. The ratio of the capacity and occupancy is about 1. Which means most of the shelters are about running out of space.
+  
+  In this paper, I first described the data in the data set and how it is collected. Secondly, I indicated the relationship between capacity and occupancy. Then I explained the histogram for capacity, occupancy and their ratio. Finally, I point out the weakness of the survey and what we should do in the future.
+  
+
+# Data
+
+  The data set collects the information of all the active shelters in Toronto, including the name of the shelters, the capacity of the shelters and the number of homeless clients occupied the spaces the next morning at 4 AM. A total of 31162 observation has been collected since the beginning of the year. During the COVID-19 period, the data set contains the capacity data based on the pre-existing arrangement. However, the capacity data keep changing throughout the year to implement physical distance in the facilities.
+  
+
+```{r, echo = FALSE, message=FALSE}
+library(opendatatoronto)
+library(dplyr)
+
+# get package
+package <- show_package("8a6eceb2-821b-4961-a29d-758f3087732d")
+package
+
+# get all resources for this package
+resources <- list_package_resources("8a6eceb2-821b-4961-a29d-758f3087732d")
+
+# identify datastore resources; by default, Toronto Open Data sets datastore resource format to CSV for non-geospatial and GeoJSON for geospatial resources
+datastore_resources <- filter(resources, tolower(format) %in% c('csv', 'geojson'))
+
+# load the first datastore resource as a sample
+data <- filter(datastore_resources, row_number()==1) %>% get_resource()
+data
+```
+
+
+```{r, echo = FALSE, message=FALSE}
+library(tidyverse)
+plot(data$CAPACITY, data$OCCUPANCY, main="Figure 1")
+df <- data %>% select(CAPACITY, OCCUPANCY)
+summary(df)
+```
+
+The variables we focus on are capacity and occupancy of the shelters. Figure 1 is a plot shows the relationship between capacity and occupancy. It indicated that the capacity is positively associated with occupancy. The higher the capacity, the higher the occupancy. The shelters' minimum capacity is 0, the maximum is 888, and the median is 34. The shelters' minimum occupancy is 0, the maximum is 778, and the median is 28. 
+
+```{r, echo = FALSE, message=FALSE}
+df %>% ggplot(aes(CAPACITY)) + geom_histogram() + ggtitle("Figure 2")
+df %>% ggplot(aes(OCCUPANCY)) + geom_histogram() + ggtitle("Figure 3")
+df $ ratio = df $ OCCUPANCY / df $ CAPACITY
+df %>% ggplot(aes(ratio)) + geom_histogram() + ggtitle("Figure 4")
+```
+
+Figure 2 shows the distribution of capacity. The distribution is heavily right-skewed and the graph shows the capacity for most of the shelters is less than 250. Figure 3 shows the distribution of occupancy. The distribution is also heavily right-skewed and the graph shows the occupancy for most of the shelters is less than 200. Figure 4 shows the distribution for the ratio of capacity and occupancy. The distribution is left-skewed and the median of the distribution is about 1, which can reflect a problem that most of the shelters' capacity is approaching saturation. The spaces in the shelters may not be enough for homeless people to stay during the COVID-19 period.
+
+# Discussion
+  
+  An article from the PressProgress states that "Toronto's shelters are now consistently about 90% capacity", which is right in our study. The shelters' capacity is approaching saturation in Toronto and people live in such cloudy space is very dangerous. According to the City data, there is an increase in the COVID-19 cases in the shelters. Hundreds of people in the shelters have contracted COVID-19 and this may lead homeless people to live outdoors rather than indoors. The article "Toronto must defend the homeless" from CANADIAN CIVIL LIBERTIES ASSOCIATION(CCLA) also pointed out that the public facilities' closure also affected the shelter users. Moreover, the closure and restriction on outdoor activities also limited the relief provided by private, charitable and public sectors.
+  
+  The data set is not random sampling, and it can't represent the population. Some factors can influence the result, such as COVID-19 can influence the shelters' capacity and occupancy. The spaces available in the shelters may decrease to implement a physical distance. The occupancy date in the survey did not collect randomly, since the number of people who occupied the current date spaces only collects the next day at 4 AM. 
+  
+# Weakness and next step
+  
+  We should do more researches on how the capacity and occupancy changed in the shelters during the COVID-19 period. Then we can explore how the shelters in Toronto changed during this year. The government should build more shelters for the homeless people to ensure more spaces available for them to stay and keep physical distance to prevent coronavirus.  
+
+
+# References
+
+- JJ Allaire and Yihui Xie and Jonathan McPherson and Javier Luraschi and Kevin Ushey and Aron Atkins
+  and Hadley Wickham and Joe Cheng and Winston Chang and Richard Iannone (2020). rmarkdown: Dynamic
+  Documents for R. R package version 2.3. URL https://rmarkdown.rstudio.com.
+  
+- Open Data Dataset. (n.d.). Retrieved March 2, 2021, from https://open.toronto.ca/dataset/daily-shelter-occupancy/
+
+- Clapp, |. (2020, June 03). COVID-19 pushing homeless into encampments. Retrieved March 2, 2021, from http://spacing.ca/toronto/2020/06/03/covid-19-pushing-homeless-into-encampments/
+
+- Toronto's Shelters Are Now Consistently Above 90% Capacity – And That Is Extremely&nbsp;Dangerous. (2019, January 28). Retrieved March 10, 2021, from https://pressprogress.ca/torontos-shelters-are-now-consistently-above-90-capacity-and-that-is-extremely-dangerous/
+
+- Toronto needs to take action to defend the homeless. (2020, July 06). Retrieved March 20, 2021, from https://ccla.org/toronto-must-defend-homeless/
